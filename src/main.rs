@@ -21,14 +21,14 @@ lazy_static! {
 }
 
 fn main() -> io::Result<()> {
-    let file_path = "01_debug.txt";
+    let file_path = "01_input.txt";
     let file = File::open(file_path)?;
 
-    let sum: u32 = io::BufReader::new(file).lines()
-                                           .filter_map(|line| line.ok().and_then(|s| extract_digits(&s)))
-                                           .map(|(first, last)| format!("{}{}", first, last).parse::<u32>().ok())
-                                           .filter_map(|parsed_number| parsed_number)
-                                           .sum();
+    let sum: u32 = io::BufReader::new(file)
+        .lines()
+        .filter_map(|line| line.ok().and_then(|s| extract_digits(&s)))
+        .map(|(first, last)| format!("{}{}", first, last).parse::<u32>().ok())
+        .filter_map(|parsed_number| parsed_number).sum();
 
     println!("Sum: {}", sum);
 

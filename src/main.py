@@ -11,7 +11,7 @@ WORDS_TO_REPLACE = {
 }
 
 def main() -> None:
-    with open('01_debug.txt', 'r') as file:
+    with open('01_input.txt', 'r') as file:
         sum_result = sum(extract_digits(s[:-1]) for s in file)
 
     print('Sum:', sum_result)
