@@ -1,6 +1,8 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
 
+const OFFSETS: [(isize, isize); 8] = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)];
+
 fn part1() {
     let input = fs::read_to_string("input.txt").expect("Failed to read file");
     let schematic: Vec<&str> = input.lines().collect();
@@ -19,17 +21,14 @@ fn part1() {
             if current_char.is_digit(10) {
                 current_part_number.push(current_char);
 
-                for &dx in &[-1, 0, 1] {
-                    for &dy in &[-1, 0, 1] {
-                        let ni = (i as isize + dx) as usize;
-                        let nj = (j as isize + dy) as usize;
+                for (dx, dy) in OFFSETS {
+                    let (ni, nj) = (i.wrapping_add_signed(dx), j.wrapping_add_signed(dy));
 
-                        if ni < rows && nj < cols {
-                            let adjacent_char = schematic[ni].chars().nth(nj).unwrap();
+                    if ni < rows && nj < cols {
+                        let adjacent_char = schematic[ni].chars().nth(nj).unwrap();
 
-                            if !adjacent_char.is_digit(10) && adjacent_char != '.' {
-                                is_part_number = true;
-                            }
+                        if !adjacent_char.is_digit(10) && adjacent_char != '.' {
+                            is_part_number = true;
                         }
                     }
                 }
@@ -65,14 +64,11 @@ fn part2() {
             if current_char.is_digit(10) {
                 current_number.push(current_char);
 
-                for &dx in &[-1, 0, 1] {
-                    for &dy in &[-1, 0, 1] {
-                        let ni = (i as isize + dx) as usize;
-                        let nj = (j as isize + dy) as usize;
+                for (dx, dy) in OFFSETS {
+                    let (ni, nj) = (i.wrapping_add_signed(dx), j.wrapping_add_signed(dy));
 
-                        if ni < rows && nj < cols && schematic[ni].chars().nth(nj).unwrap() == '*' {
-                            adjacent_gears.insert((ni, nj));
-                        }
+                    if ni < rows && nj < cols && schematic[ni].chars().nth(nj).unwrap() == '*' {
+                        adjacent_gears.insert((ni, nj));
                     }
                 }
             } else {
