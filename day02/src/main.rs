@@ -5,13 +5,10 @@ use std::io::{self, BufRead};
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref BAG: HashMap<&'static str, i32> = [
-        ("red", 12),
-        ("green", 13),
-        ("blue", 14),
-    ].iter().cloned().collect();
+    static ref BAG: HashMap<&'static str, u64> = [("red", 12), ("green", 13), ("blue", 14),]
+        .into_iter()
+        .collect();
 }
-
 
 fn part1() {
     let mut all = HashSet::new();
@@ -31,7 +28,7 @@ fn part1() {
 
                     for cube in cubes {
                         let mut iter = cube.trim().split(' ');
-                        let amount: i32 = iter.next().unwrap().parse().unwrap();
+                        let amount: u64 = iter.next().unwrap().parse().unwrap();
                         let color: &str = iter.next().unwrap();
 
                         if amount > *BAG.get(color).unwrap() {
@@ -41,7 +38,7 @@ fn part1() {
                 }
             }
         }
-        println!("Answer: {}", all.difference(&bad).sum::<i32>());
+        println!("Answer: {}", all.difference(&bad).sum::<u64>());
     } else {
         eprintln!("Error reading the file.");
     }
@@ -61,7 +58,7 @@ fn part2() {
 
                         for cube in cubes {
                             let mut iter = cube.trim().split(' ');
-                            let amount: i32 = iter.next().unwrap().parse().unwrap();
+                            let amount: u64 = iter.next().unwrap().parse().unwrap();
                             let color: &str = iter.next().unwrap();
                             match color {
                                 "red" => color_amounts[0].push(amount),
@@ -76,13 +73,13 @@ fn part2() {
                         color_amounts
                             .iter()
                             .map(|cubes_amounts| cubes_amounts.iter().max().unwrap())
-                            .product()
+                            .product(),
                     );
                 }
             }
         }
 
-        println!("Answer: {}", r.iter().sum::<i32>());
+        println!("Answer: {}", r.iter().sum::<u64>());
     } else {
         eprintln!("Failed to open the file.");
     }

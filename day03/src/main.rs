@@ -1,7 +1,16 @@
 use std::collections::{HashMap, HashSet};
 use std::fs;
 
-const OFFSETS: [(isize, isize); 8] = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)];
+const OFFSETS: [(isize, isize); 8] = [
+    (-1, -1),
+    (-1, 0),
+    (-1, 1),
+    (0, -1),
+    (0, 1),
+    (1, -1),
+    (1, 0),
+    (1, 1),
+];
 
 fn part1() {
     let input = fs::read_to_string("input.txt").expect("Failed to read file");
@@ -34,7 +43,7 @@ fn part1() {
                 }
             } else {
                 if !current_part_number.is_empty() && is_part_number {
-                    part_numbers.push(current_part_number.parse::<i32>().unwrap());
+                    part_numbers.push(current_part_number.parse::<u64>().unwrap());
                 }
 
                 current_part_number.clear();
@@ -43,7 +52,7 @@ fn part1() {
         }
     }
 
-    println!("Answer: {}", part_numbers.iter().sum::<i32>());
+    println!("Answer: {}", part_numbers.iter().sum::<u64>());
 }
 
 fn part2() {
@@ -55,7 +64,7 @@ fn part2() {
 
     let mut current_number = String::new();
     let mut adjacent_gears = HashSet::new();
-    let mut gear_to_ratios: HashMap<(usize, usize), Vec<i32>> = HashMap::new();
+    let mut gear_to_ratios: HashMap<(usize, usize), Vec<u64>> = HashMap::new();
 
     for i in 0..rows {
         for j in 0..cols {
@@ -87,13 +96,14 @@ fn part2() {
         }
     }
 
-    let answer: i32 = gear_to_ratios
-        .values()
-        .filter(|ratios| ratios.len() == 2)
-        .map(|ratios| ratios[0] * ratios[1])
-        .sum();
-
-    println!("Answer: {}", answer);
+    println!(
+        "Answer: {}",
+        gear_to_ratios
+            .values()
+            .filter(|ratios| ratios.len() == 2)
+            .map(|ratios| ratios[0] * ratios[1])
+            .sum::<u64>(),
+    );
 }
 
 fn main() {

@@ -15,7 +15,9 @@ lazy_static! {
         ("7", 7),
         ("8", 8),
         ("9", 9),
-    ].iter().cloned().collect();
+    ]
+    .into_iter()
+    .collect();
 }
 
 lazy_static! {
@@ -38,9 +40,10 @@ lazy_static! {
         ("seven", 7),
         ("eight", 8),
         ("nine", 9),
-    ].iter().cloned().collect();
+    ]
+    .into_iter()
+    .collect();
 }
-
 
 fn extract_digits(s: &str, word_to_digit: &HashMap<&'static str, i32>) -> Option<i32> {
     let mut digits = Vec::new();
