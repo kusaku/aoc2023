@@ -8,8 +8,6 @@ def seeds_ranges1(seeds_line):
 
 def seeds_ranges2(seeds_line):
     for seeds_start, seeds_length in zip(*[map(int, seeds_line[6:].split())] * 2):
-        # for seed in range(seeds_start, seeds_start + seeds_length):
-        #     yield seed, seed
         yield seeds_start, seeds_start + seeds_length - 1
 
 
@@ -45,46 +43,38 @@ def offset_seeds(rules, seeds_ranges):
             yield seeds_start, seeds_end
 
 
-def part12():
+def part1():
     almanac = iter(Path('input.txt').read_text().splitlines())
-    seeds_line = next(almanac)
-    seeds_ranges = seeds_ranges2(seeds_line)
-    # first_seed_range = next(seeds_ranges2(seeds_line))
-    # print(first_seed_range)
-    # print()
-    # seeds_ranges = iter([first_seed_range])
-
-    # seeds_ranges = iter([(82, 82)])
-
-    # print(list(gen_seeds2(seed_line)))
-
-    steps = {}
+    seeds_ranges = seeds_ranges1(next(almanac))
 
     for rule_line in almanac:
         if rule_line == '':
-            step_name = next(almanac)[:-5]
+            step_name, rules = next(almanac)[:-5], []
+            # chain generator
+            seeds_ranges = offset_seeds(rules, seeds_ranges)
         else:
             dst_start, src_start, length = map(int, rule_line.split())
-            rules = steps.setdefault(step_name, [])
             rules.append((src_start, src_start + length, dst_start - src_start))
 
-    for step_name, rules in steps.items():
-        # seeds_ranges = list(seeds_ranges)
-        # print(f'{seeds_ranges} -> ', end='')
-        # seeds_ranges = iter(seeds_ranges)
-        seeds_ranges = offset_seeds(rules, seeds_ranges)
-        # seeds_ranges = list(seeds_ranges)
-        # print(f'{step_name} - {seeds_ranges}')
-        # seeds_ranges = iter(seeds_ranges)
+    print(f'Answer: {min(s[0] for s in seeds_ranges)}')
 
-    # seeds_ranges = list(seeds_ranges)
-    # for s in seeds_ranges:
-    #     print(s)
 
-    # part1, sample - 35, input - 199602917
-    # part1, sample - 46, input - 2254686 (direct search)
+def part2():
+    almanac = iter(Path('input.txt').read_text().splitlines())
+    seeds_ranges = seeds_ranges2(next(almanac))
+
+    for rule_line in almanac:
+        if rule_line == '':
+            step_name, rules = next(almanac)[:-5], []
+            # chain generators
+            seeds_ranges = offset_seeds(rules, seeds_ranges)
+        else:
+            dst_start, src_start, length = map(int, rule_line.split())
+            rules.append((src_start, src_start + length, dst_start - src_start))
+
     print(f'Answer: {min(s[0] for s in seeds_ranges)}')
 
 
 if __name__ == '__main__':
-    part12()
+    part1()
+    part2()
