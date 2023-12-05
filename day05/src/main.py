@@ -15,6 +15,7 @@ def seeds_ranges2(seeds_line):
 
 def offset_seeds(rules, seeds_ranges):
     for seeds_start, seeds_end in seeds_ranges:
+        # apply offsets
         for range_start, range_end, offset in rules:
             # seeds inside range
             if seeds_start >= range_start and seeds_end <= range_end:
@@ -27,23 +28,31 @@ def offset_seeds(rules, seeds_ranges):
                 yield range_end, seeds_end
                 break
             # seeds intersect with range on the left
-            elif seeds_start < range_start <= seeds_end:
+            elif seeds_start <= range_start <= seeds_end <= range_end:
                 yield seeds_start, range_start - 1
                 yield range_start + offset, seeds_end + offset
                 break
             # seeds intersect with range on the right
-            elif seeds_start <= range_end < seeds_end:
-                yield range_start, seeds_start - 1
-                yield seeds_start + offset, range_end - 1 + offset
+            elif range_start <= seeds_start <= range_end <= seeds_end:
+                yield seeds_start, range_end - 1
+                yield range_end + offset, seeds_end + offset
                 break
+            # seeds and range do not intersect
+            else:
+                assert range_end < seeds_start or seeds_end < range_start
         else:
+            # no offsets were applied
             yield seeds_start, seeds_end
 
 
 def part12():
     almanac = iter(Path('input.txt').read_text().splitlines())
     seeds_line = next(almanac)
-    seeds_ranges = seeds_ranges1(seeds_line)
+    seeds_ranges = seeds_ranges2(seeds_line)
+    # first_seed_range = next(seeds_ranges2(seeds_line))
+    # print(first_seed_range)
+    # print()
+    # seeds_ranges = iter([first_seed_range])
 
     # seeds_ranges = iter([(82, 82)])
 
@@ -61,7 +70,7 @@ def part12():
 
     for step_name, rules in steps.items():
         # seeds_ranges = list(seeds_ranges)
-        # print(f'{step_name} - {seeds_ranges} -> ', end='')
+        # print(f'{seeds_ranges} -> ', end='')
         # seeds_ranges = iter(seeds_ranges)
         seeds_ranges = offset_seeds(rules, seeds_ranges)
         # seeds_ranges = list(seeds_ranges)
