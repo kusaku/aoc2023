@@ -4,9 +4,11 @@ use std::fs;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref BAG: HashMap<&'static str, u64> = [("red", 12), ("green", 13), ("blue", 14),]
-        .into_iter()
-        .collect();
+    static ref BAG: HashMap<&'static str, u64> = HashMap::from([
+        ("red", 12),
+        ("green", 13),
+        ("blue", 14),
+    ]);
 }
 
 fn part1() {

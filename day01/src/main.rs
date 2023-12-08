@@ -3,7 +3,7 @@ use std::fs;
 use lazy_static::lazy_static;
 
 lazy_static! {
-    static ref WORD_TO_DIGIT1: HashMap<&'static str, usize> = [
+    static ref WORD_TO_DIGIT1: HashMap<&'static str, usize> = HashMap::from([
         ("1", 1),
         ("2", 2),
         ("3", 3),
@@ -13,11 +13,9 @@ lazy_static! {
         ("7", 7),
         ("8", 8),
         ("9", 9),
-    ]
-    .into_iter()
-    .collect();
+    ]);
 
-    static ref WORD_TO_DIGIT2: HashMap<&'static str, usize> = [
+    static ref WORD_TO_DIGIT2: HashMap<&'static str, usize> = HashMap::from([
         ("1", 1),
         ("2", 2),
         ("3", 3),
@@ -36,9 +34,7 @@ lazy_static! {
         ("seven", 7),
         ("eight", 8),
         ("nine", 9),
-    ]
-    .into_iter()
-    .collect();
+    ]);
 }
 
 fn extract_digits(s: &str, word_to_digit: &HashMap<&str, usize>) -> Option<usize> {

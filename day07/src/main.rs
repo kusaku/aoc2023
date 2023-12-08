@@ -12,17 +12,15 @@ struct Row {
 }
 
 lazy_static! {
-    static ref RANK_ORDER: HashMap<Vec<usize>, usize> = [
-        (vec![5], 6),             // Five of a kind
-        (vec![4, 1], 5),          // Four of a kind
-        (vec![3, 2], 4),          // Full house
-        (vec![3, 1, 1], 3),       // Three of a kind
-        (vec![2, 2, 1], 2),       // Two pair
-        (vec![2, 1, 1, 1], 1),    // One pair
+    static ref RANK_ORDER: HashMap<Vec<usize>, usize> = HashMap::from([
+        (vec![5],             6), // Five of a kind
+        (vec![4, 1],          5), // Four of a kind
+        (vec![3, 2],          4), // Full house
+        (vec![3, 1, 1],       3), // Three of a kind
+        (vec![2, 2, 1],       2), // Two pair
+        (vec![2, 1, 1, 1],    1), // One pair
         (vec![1, 1, 1, 1, 1], 0), // High card
-    ]
-    .into_iter()
-    .collect();
+    ]);
 }
 
 fn part1() {
