@@ -1,6 +1,5 @@
 use std::collections::{HashMap, HashSet};
-use std::fs::File;
-use std::io::{self, BufRead};
+use std::fs;
 
 use lazy_static::lazy_static;
 
@@ -14,75 +13,60 @@ fn part1() {
     let mut all = HashSet::new();
     let mut bad = HashSet::new();
 
-    if let Ok(file) = File::open("input.txt") {
-        for line in io::BufReader::new(file).lines() {
-            if let Ok(entry) = line {
-                let mut iter = entry.split(':');
-                let game_number = iter.next().unwrap()[5..].parse().unwrap();
-                let results = iter.next().unwrap();
+    let input = fs::read_to_string("input.txt").expect("Failed to read file");
 
-                all.insert(game_number);
+    for line in input.lines() {
+        let mut iter = line.splitn(2, ':');
+        let game_number = iter.next().unwrap()[5..].parse().unwrap();
+        let results = iter.next().unwrap();
 
-                for result in results.split(';') {
-                    let cubes: Vec<&str> = result.split(',').collect();
+        all.insert(game_number);
 
-                    for cube in cubes {
-                        let mut iter = cube.trim().split(' ');
-                        let amount: u64 = iter.next().unwrap().parse().unwrap();
-                        let color: &str = iter.next().unwrap();
+        for result in results.split(';') {
+            for cube in result.split(',') {
+                let mut iter = cube.split_whitespace();
+                let amount: u64 = iter.next().unwrap().parse().unwrap();
+                let color: &str = iter.next().unwrap();
 
-                        if amount > *BAG.get(color).unwrap() {
-                            bad.insert(game_number);
-                        }
-                    }
+                if amount > BAG[color] {
+                    bad.insert(game_number);
                 }
             }
         }
-        println!("Answer: {}", all.difference(&bad).sum::<u64>());
-    } else {
-        eprintln!("Error reading the file.");
     }
+
+    println!("Answer: {}", all.difference(&bad).sum::<u64>());
 }
 
 fn part2() {
-    let mut r = Vec::new();
+    let mut r = 0;
 
-    if let Ok(file) = File::open("input.txt") {
-        for line in io::BufReader::new(file).lines() {
-            if let Ok(entry) = line {
-                if let Some(results) = entry.split(':').nth(1) {
-                    let mut color_amounts = vec![Vec::new(); 3]; // red, green, blue
+    let input = fs::read_to_string("input.txt").expect("Failed to read file");
 
-                    for result in results.split(';') {
-                        let cubes: Vec<&str> = result.split(',').collect();
+    for line in input.lines() {
+        let mut color_amounts = vec![Vec::new(); 3]; // red, green, blue
 
-                        for cube in cubes {
-                            let mut iter = cube.trim().split(' ');
-                            let amount: u64 = iter.next().unwrap().parse().unwrap();
-                            let color: &str = iter.next().unwrap();
-                            match color {
-                                "red" => color_amounts[0].push(amount),
-                                "green" => color_amounts[1].push(amount),
-                                "blue" => color_amounts[2].push(amount),
-                                _ => panic!("Unexpected color"),
-                            }
-                        }
-                    }
+        for result in line.splitn(2, ':').last().unwrap().split(';') {
+            for cube in result.split(',') {
+                let mut iter = cube.trim().split(' ');
+                let amount: u64 = iter.next().unwrap().parse().unwrap();
 
-                    r.push(
-                        color_amounts
-                            .iter()
-                            .map(|cubes_amounts| cubes_amounts.iter().max().unwrap())
-                            .product(),
-                    );
+                match iter.next().unwrap() {
+                    "red" => color_amounts[0].push(amount),
+                    "green" => color_amounts[1].push(amount),
+                    "blue" => color_amounts[2].push(amount),
+                    _ => panic!("Unexpected color"),
                 }
             }
         }
 
-        println!("Answer: {}", r.iter().sum::<u64>());
-    } else {
-        eprintln!("Failed to open the file.");
+        r += color_amounts
+            .iter()
+            .map(|cubes_amounts| cubes_amounts.iter().max().unwrap())
+            .product::<u64>();
     }
+
+    println!("Answer: {}", r);
 }
 
 fn main() {

@@ -32,7 +32,7 @@ def part2() -> None:
     with open('input.txt') as file:
         for line in file:
             _, results = line.split(':', maxsplit=1)
-            amounts = {'red': [], 'green': [], 'blue': [],}
+            amounts = {'red': [], 'green': [], 'blue': []}
             for result in results.split(';'):
                 cubes = result.split(',')
                 for cube in cubes:
