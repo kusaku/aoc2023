@@ -6,7 +6,7 @@ use num_integer::Integer;
 fn part1() {
     let content = fs::read_to_string("input.txt").expect("Error reading file");
     let data: Vec<&str> = content.lines().collect();
-    let dirs: Vec<char> = data[0].chars().collect();
+    let dirs: &str = data[0];
     let mut the_map: HashMap<&str, HashMap<&char, &str>> = HashMap::new();
 
     for line in data.iter().skip(2) {
@@ -24,12 +24,12 @@ fn part1() {
     let mut curr = "AAA";
     let mut steps = 0;
 
-    loop {
+    for (i, dir) in dirs.chars().cycle().enumerate() {
         if curr == "ZZZ" {
             break;
         }
-        curr = the_map[&curr][&dirs[steps % dirs.len()]];
-        steps += 1;
+        curr = the_map[&curr][&dir];
+        steps = i + 1;
     }
 
     println!("Answer: {}", steps);
@@ -38,7 +38,7 @@ fn part1() {
 fn part2() {
     let content = fs::read_to_string("input.txt").expect("Error reading file");
     let data: Vec<&str> = content.lines().collect();
-    let dirs: Vec<char> = data[0].chars().collect();
+    let dirs: &str = data[0];
     let mut the_map: HashMap<&str, HashMap<&char, &str>> = HashMap::new();
 
     for line in data.iter().skip(2) {
@@ -58,13 +58,13 @@ fn part2() {
         let mut steps = 0;
         curr = node;
 
-        loop {
+        for (i, dir) in dirs.chars().cycle().enumerate() {
             if curr.ends_with('Z') {
                 least_steps.push(steps);
                 break;
             }
-            curr = the_map[&curr][&dirs[steps % dirs.len()]];
-            steps += 1;
+            curr = the_map[&curr][&dir];
+            steps = i + 1;
         }
     }
 
