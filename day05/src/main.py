@@ -1,79 +1,73 @@
+from itertools import batched
 from pathlib import Path
 
+def split_and_shift(s_start, s_length, dest_start, src_start, src_length):
+    src_end = src_start + src_length - 1
+    s_end = s_start + s_length - 1
+    shifted = []
+    remaining = []
 
-def seeds_ranges1(seeds_line):
-    for seed in map(int, seeds_line[6:].split()):
-        yield seed, seed
+    if s_end < src_start or s_start > src_end:
+        remaining.append((s_start, s_length))
+    else:
+        if s_start < src_start:
+            remaining.append((s_start, src_start - s_start))
 
+        if s_end > src_end:
+            remaining.append((src_end + 1, s_end - src_end))
 
-def seeds_ranges2(seeds_line):
-    for seeds_start, seeds_length in zip(*[map(int, seeds_line[6:].split())] * 2):
-        yield seeds_start, seeds_start + seeds_length - 1
+        overlap_start = max(s_start, src_start)
+        overlap_end = min(s_end, src_end)
+        shifted.append((dest_start + overlap_start - src_start, overlap_end - overlap_start + 1))
 
+    return remaining, shifted
 
-def offset_seeds(rules, seeds_ranges):
-    for seeds_start, seeds_end in seeds_ranges:
-        # apply offsets
-        for range_start, range_end, offset in rules:
-            # seeds inside range
-            if seeds_start >= range_start and seeds_end <= range_end:
-                yield seeds_start + offset, seeds_end + offset
-                break
-            # range inside seeds
-            elif seeds_start < range_start and seeds_end > range_end:
-                yield seeds_start, range_start - 1
-                yield range_start + offset, range_end - 1 + offset
-                yield range_end, seeds_end
-                break
-            # seeds intersect with range on the left
-            elif seeds_start <= range_start <= seeds_end <= range_end:
-                yield seeds_start, range_start - 1
-                yield range_start + offset, seeds_end + offset
-                break
-            # seeds intersect with range on the right
-            elif range_start <= seeds_start <= range_end <= seeds_end:
-                yield seeds_start, range_end - 1
-                yield range_end + offset, seeds_end + offset
-                break
-            # seeds and range do not intersect
-            else:
-                assert range_end < seeds_start or seeds_end < range_start
-        else:
-            # no offsets were applied
-            yield seeds_start, seeds_end
+def offset_seeds(rules, seed_ranges):
+    new_ranges_seeds = []
 
+    for seed_range in seed_ranges:
+        remaining_ranges = [seed_range]
+        shifted_ranges = []
+
+        for dest_start, src_start, src_length in rules:
+            updated_ranges = []
+
+            for s_start, s_length in remaining_ranges:
+                rem, shift = split_and_shift(s_start, s_length, dest_start, src_start, src_length)
+                updated_ranges.extend(rem)
+                shifted_ranges.extend(shift)
+
+            remaining_ranges = updated_ranges
+
+        new_ranges_seeds.extend(remaining_ranges)
+        new_ranges_seeds.extend(shifted_ranges)
+
+    return new_ranges_seeds
 
 def part1():
-    almanac = iter(Path('input.txt').read_text().splitlines())
-    seeds_ranges = seeds_ranges1(next(almanac))
+    seed_sec, *rule_secs = Path('input.txt').read_text().strip().split("\n\n")
 
-    for rule_line in almanac:
-        if rule_line == '':
-            step_name, rules = next(almanac)[:-5], []
-            # chain generator
-            seeds_ranges = offset_seeds(rules, seeds_ranges)
-        else:
-            dst_start, src_start, length = map(int, rule_line.split())
-            rules.append((src_start, src_start + length, dst_start - src_start))
+    seed_ranges = [(s_start, 1) for s_start in map(int, seed_sec.split("seeds:")[1].split())]
 
-    print(f'Answer: {min(s[0] for s in seeds_ranges)}')
+    for rule_sec in rule_secs:
+        rules = [tuple(map(int, line.split())) for line in rule_sec.strip().split("\n")[1:]]
+        seed_ranges = offset_seeds(rules, seed_ranges)
 
+    print(f'Answer: {min(s_start for s_start, s_length in seed_ranges)}')
 
 def part2():
-    almanac = iter(Path('input.txt').read_text().splitlines())
-    seeds_ranges = seeds_ranges2(next(almanac))
+    seed_sec, *rule_secs = Path('input.txt').read_text().strip().split("\n\n")
 
-    for rule_line in almanac:
-        if rule_line == '':
-            step_name, rules = next(almanac)[:-5], []
-            # chain generators
-            seeds_ranges = offset_seeds(rules, seeds_ranges)
-        else:
-            dst_start, src_start, length = map(int, rule_line.split())
-            rules.append((src_start, src_start + length, dst_start - src_start))
+    seed_ranges = [
+        (s_start, s_length)
+        for s_start, s_length in batched(map(int, seed_sec.split("seeds:")[1].split()), 2)
+    ]
 
-    print(f'Answer: {min(s[0] for s in seeds_ranges)}')
+    for rule_sec in rule_secs:
+        rules = [tuple(map(int, line.split())) for line in rule_sec.strip().split("\n")[1:]]
+        seed_ranges = offset_seeds(rules, seed_ranges)
 
+    print(f'Answer: {min(s_start for s_start, s_length in seed_ranges)}')
 
 if __name__ == '__main__':
     part1()
